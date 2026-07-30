@@ -1,5 +1,15 @@
 # Home Lab
 
+# Static IP Allocation
+
+| Device | IP |
+|---------|----|
+| Router | 192.168.1.1 |
+| Proxmox | 192.168.1.50 |
+| Pi-hole | 192.168.1.10 |
+| WireGuard | 192.168.1.20 |
+| Uptime Kuma | 192.168.1.30 |
+
 ## Hardware
 
 - Intel NUC7i3DNB
@@ -142,3 +152,22 @@ vicvpn.go.ro
 
 - Weekly Proxmox LXC backups
 - Backup copies stored on laptop
+
+---
+
+# Host Recovery
+
+1. Install Proxmox VE.
+2. Set hostname to `proxmox`.
+3. Configure:
+   - IP: 192.168.1.50/24
+   - Gateway: 192.168.1.1
+   - DNS: 192.168.1.10
+4. Create `vmbr0`.
+5. Restore LXC backups.
+6. Copy `/root/scripts`.
+7. Restore root crontab.
+8. Verify:
+   - Pi-hole
+   - WireGuard
+   - Uptime Kuma
