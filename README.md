@@ -1,4 +1,4 @@
-# Homelab
+# Home Lab
 
 ## Hardware
 
@@ -12,6 +12,8 @@
 
 # Network
 
+## Internet
+
 ```
 Internet
     │
@@ -22,21 +24,40 @@ ZTE ZXHN H3601P
 Proxmox
 ```
 
-LAN:
+## LAN
 
 ```
-192.168.1.0/24
+Subnet: 192.168.1.0/24
+Gateway: 192.168.1.1
 ```
 
-Router:
+## DNS
+
+Primary DNS
 
 ```
-192.168.1.1
+192.168.1.10
+```
+
+## IPv6
+
+```
+DHCPv6: Disabled
+RA: Disabled
 ```
 
 ---
 
-# Running Containers
+# Proxmox
+
+## Host
+
+- Proxmox VE
+- Local storage on NVMe SSD
+
+---
+
+# Containers
 
 ## CT100 - Pi-hole
 
@@ -46,12 +67,12 @@ Router:
 192.168.1.10
 ```
 
-### Purpose
+**Purpose**
 
-- Network-wide DNS
-- Ad blocking
+- Local DNS
+- Network-wide ad blocking
 
-### Services
+**Services**
 
 - Pi-hole
 
@@ -65,18 +86,24 @@ Router:
 192.168.1.20
 ```
 
-### Purpose
+**Purpose**
 
 - Remote VPN access
 
-### Services
+**Services**
 
 - WireGuard
 
-### Port Forwarding
+**Port**
 
 ```
 UDP 51820
+```
+
+**DDNS**DIGI
+
+```
+vicvpn.go.ro
 ```
 
 ---
@@ -89,11 +116,11 @@ UDP 51820
 192.168.1.30
 ```
 
-### Purpose
+**Purpose**
 
 - Service monitoring
 
-### Monitors
+**Monitors**
 
 - Internet
 - Pi-hole
@@ -101,66 +128,17 @@ UDP 51820
 
 ---
 
-# DNS
+# Router
 
-Primary DNS:
+## Port Forwarding
 
-```
-192.168.1.10
-```
-
-Secondary DNS:
-
-```
-None
-```
+| Service | Protocol | External Port | Internal Address | Internal Port |
+|----------|----------|--------------:|------------------|--------------:|
+| WireGuard | UDP | 51820 | 192.168.1.20 | 51820 |
 
 ---
 
-# IPv6
+# Backup
 
-Current status:
-
-```
-Enabled on router
-```
-
-(Adjust this section if you later decide to permanently disable IPv6.)
-
----
-
-# Backup Strategy
-
-Weekly:
-
-- Proxmox LXC backups (`vzdump`)
-- Copy backups to laptop
-
----
-
-# Maintenance
-
-After every Proxmox update:
-
-- Backup all containers
-- Verify Pi-hole
-- Verify WireGuard
-- Verify Uptime Kuma
-
----
-
-# Port Forwarding
-
-| Service | Protocol | Port | Destination |
-|----------|----------|-----:|-------------|
-| WireGuard | UDP | 51820 | 192.168.1.20 |
-
----
-
-# Services Summary
-
-| Container | Purpose | Status |
-|-----------|---------|--------|
-| CT100 | Pi-hole | ✅ Running |
-| CT101 | WireGuard | ✅ Running |
-| CT102 | Uptime Kuma | ✅ Running |
+- Weekly Proxmox LXC backups
+- Backup copies stored on laptop
