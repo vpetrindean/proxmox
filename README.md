@@ -3,89 +3,164 @@
 ## Hardware
 
 - Intel NUC7i3DNB
-- 8 GB RAM
-- 128 GB NVMe
+- Intel Core i3-7100U
+- 8 GB DDR4 RAM
+- 128 GB NVMe SSD
+- Proxmox VE
 
-## Network
+---
 
+# Network
+
+```
 Internet
-↓
+    │
 FiberHome HG6544C (ONT)
-↓
+    │
 ZTE ZXHN H3601P
-↓
+    │
 Proxmox
+```
 
-## Containers
+LAN:
 
-### CT100 - Pi-hole
+```
+192.168.1.0/24
+```
 
-IP: 192.168.1.10
+Router:
 
-Purpose:
-- Network DNS
+```
+192.168.1.1
+```
+
+---
+
+# Running Containers
+
+## CT100 - Pi-hole
+
+**IP**
+
+```
+192.168.1.10
+```
+
+### Purpose
+
+- Network-wide DNS
 - Ad blocking
 
-Services:
+### Services
+
 - Pi-hole
 
 ---
 
-### CT101 - WireGuard
+## CT101 - WireGuard
 
-IP: 192.168.1.20
+**IP**
 
-Purpose:
-- VPN
+```
+192.168.1.20
+```
 
-Services:
+### Purpose
+
+- Remote VPN access
+
+### Services
+
 - WireGuard
+
+### Port Forwarding
+
+```
+UDP 51820
+```
 
 ---
 
-### CT102 - Uptime Kuma
+## CT102 - Uptime Kuma
 
-IP: 192.168.1.30
+**IP**
 
-Purpose:
-- Monitoring
+```
+192.168.1.30
+```
 
-Checks:
+### Purpose
+
+- Service monitoring
+
+### Monitors
+
 - Internet
 - Pi-hole
 - WireGuard
 
 ---
 
-### CT103 - Reserved
+# DNS
 
-Purpose:
-- Future Expenses application
+Primary DNS:
 
-Status:
-- Not functional
+```
+192.168.1.10
+```
+
+Secondary DNS:
+
+```
+None
+```
 
 ---
 
-## Backups
+# IPv6
+
+Current status:
+
+```
+Enabled on router
+```
+
+(Adjust this section if you later decide to permanently disable IPv6.)
+
+---
+
+# Backup Strategy
 
 Weekly:
-- Proxmox vzdump
-- Copy to laptop
 
-## Port Forwarding
+- Proxmox LXC backups (`vzdump`)
+- Copy backups to laptop
 
-UDP 51820 → 192.168.1.20
+---
 
-## DNS
+# Maintenance
 
-Primary:
-192.168.1.10 (Pi-hole)
+After every Proxmox update:
 
-Secondary:
-None
+- Backup all containers
+- Verify Pi-hole
+- Verify WireGuard
+- Verify Uptime Kuma
 
-## Future
+---
 
-- Jellyfin
-- Expenses
+# Port Forwarding
+
+| Service | Protocol | Port | Destination |
+|----------|----------|-----:|-------------|
+| WireGuard | UDP | 51820 | 192.168.1.20 |
+
+---
+
+# Services Summary
+
+| Container | Purpose | Status |
+|-----------|---------|--------|
+| CT100 | Pi-hole | ✅ Running |
+| CT101 | WireGuard | ✅ Running |
+| CT102 | Uptime Kuma | ✅ Running |
