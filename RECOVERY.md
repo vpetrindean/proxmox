@@ -349,3 +349,33 @@ Expected outcome:
 -   Uptime Kuma reachable
 
 Recovery complete.
+
+☐ Proxmox reachable at 192.168.1.50
+
+☐ CT100 running
+
+☐ CT101 running
+
+☐ CT102 running
+
+☐ DNS working
+
+☐ Internet reachable
+
+☐ Pi-hole admin reachable
+
+☐ Gravity updated
+
+☐ WireGuard handshake successful
+
+☐ Uptime Kuma reachable
+
+☐ Port forwarding verified
+
+☐ Router DNS = 192.168.1.10
+
+☐ Startup service enabled
+
+☐ Cron present
+
+☐ start-containers.log contains no errors
