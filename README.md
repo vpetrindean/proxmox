@@ -203,14 +203,55 @@ Europe/Bucharest
 
 # 3. Restore LXC Containers
 
-Restore the latest backups for:
+## Backup Location
+
+Copy all LXC backup files to the default Proxmox backup directory.
+
+Destination:
 
 ```text
-CT100 - Pi-hole
-CT101 - WireGuard
-CT102 - Uptime Kuma
-CT103 - Expenses (when available)
+/var/lib/vz/dump/
 ```
+
+Example:
+
+```bash
+scp *.tar.zst root@192.168.1.50:/var/lib/vz/dump/
+```
+
+or
+
+```bash
+cp /mnt/usb/*.tar.zst /var/lib/vz/dump/
+```
+
+Verify:
+
+```bash
+ls -lh /var/lib/vz/dump
+```
+
+Expected:
+
+```text
+vzdump-lxc-100-YYYY_MM_DD-HH_MM_SS.tar.zst
+vzdump-lxc-101-YYYY_MM_DD-HH_MM_SS.tar.zst
+vzdump-lxc-102-YYYY_MM_DD-HH_MM_SS.tar.zst
+```
+
+---
+
+## Restore CT100 (Pi-hole)
+
+Restore:
+
+```bash
+pct restore 100 \
+/var/lib/vz/dump/vzdump-lxc-100-YYYY_MM_DD-HH_MM_SS.tar.zst \
+local-lvm
+```
+
+Wait until the restore finishes.
 
 Verify:
 
@@ -218,7 +259,176 @@ Verify:
 pct list
 ```
 
+Expected:
+
+```text
+100 stopped
+```
+
 ---
+
+## Restore CT101 (WireGuard)
+
+```bash
+pct restore 101 \
+/var/lib/vz/dump/vzdump-lxc-101-YYYY_MM_DD-HH_MM_SS.tar.zst \
+local-lvm
+```
+
+---
+
+## Restore CT102 (Uptime Kuma)
+
+```bash
+pct restore 102 \
+/var/lib/vz/dump/vzdump-lxc-102-YYYY_MM_DD-HH_MM_SS.tar.zst \
+local-lvm
+```
+
+---
+
+## Restore CT103 (Expenses)
+
+Only if a backup exists.
+
+```bash
+pct restore 103 \
+/var/lib/vz/dump/vzdump-lxc-103-YYYY_MM_DD-HH_MM_SS.tar.zst \
+local-lvm
+```
+
+---
+
+## Verify Containers
+
+```bash
+pct list
+```
+
+Expected:
+
+```text
+100 stopped
+101 stopped
+102 stopped
+103 stopped
+```
+
+Do **not** start them manually.
+
+The startup orchestration service starts them automatically after the host boots.
+
+---
+
+## Verify Startup Configuration
+
+Each restored container should keep:
+
+- Container ID
+- Hostname
+- Static IP
+- Mount points
+- Installed software
+- Configuration
+- Startup options
+- Network configuration
+
+Verify:
+
+```bash
+pct config 100
+pct config 101
+pct config 102
+```
+
+Check:
+
+```text
+net0:
+onboot:
+startup:
+```
+
+---
+
+## Restore Complete
+
+Reboot the Proxmox host.
+
+```bash
+reboot
+```
+
+The following sequence should occur automatically:
+
+```text
+Proxmox boots
+        │
+        ▼
+start-containers.service
+        │
+        ▼
+start-containers.sh
+        │
+        ▼
+CT100 starts
+        │
+30 s delay
+        │
+▼
+CT101 starts
+        │
+30 s delay
+        │
+▼
+CT102 starts
+        │
+30 s delay
+        │
+▼
+CT103 starts
+```
+
+---
+
+## Verify Startup
+
+Container status
+
+```bash
+pct list
+```
+
+Startup log
+
+```bash
+cat /var/log/start-containers.log
+```
+
+Live monitoring
+
+```bash
+tail -f /var/log/start-containers.log
+```
+
+WireGuard
+
+```bash
+pct enter 101
+wg show
+```
+
+Pi-hole
+
+```text
+http://192.168.1.10/admin
+```
+
+Uptime Kuma
+
+```text
+http://192.168.1.30:3001
+```
 
 # 4. Restore Startup Scripts
 
